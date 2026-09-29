@@ -272,6 +272,8 @@ eigerDetector::eigerDetector (const char *portName, const char *serverHostname,
     mSequenceId     = mParams.create(EigSequenceIdStr,     asynParamInt32);
     mPendingFiles   = mParams.create(EigPendingFilesStr,   asynParamInt32);
     mSaveFiles      = mParams.create(EigSaveFilesStr,      asynParamInt32);
+    mLastSavedFile  = mParams.create(EigLastSavedFileStr,  asynParamOctet);
+    mNumFilesSaved  = mParams.create(EigNumFilesSavedStr,  asynParamInt32);
     mFileOwner      = mParams.create(EigFileOwnerStr,      asynParamOctet);
     mFileOwnerGroup = mParams.create(EigFileOwnerGroupStr, asynParamOctet);
     mFilePerms      = mParams.create(EigFilePermsStr,      asynParamInt32);
@@ -914,6 +916,8 @@ void eigerDetector::controlTask (void)
 
         // Set status parameters
         setIntegerParam(ADNumImagesCounter, 0);
+        mLastSavedFile->put("");
+        mNumFilesSaved->put(0);
         setStringParam (ADStatusMessage, "Armed");
         mSequenceId->put(sequenceId);
         mArmed->put(true);
@@ -1140,6 +1144,7 @@ void eigerDetector::pollTask (void)
         // While acquiring, wait and download every file on the list
         lock();
         mPendingFiles->put(0);
+        callParamCallbacks();
         unlock();
 
         i = 0;
@@ -1157,6 +1162,7 @@ void eigerDetector::pollTask (void)
                     lock();
                     mPendingFiles->get(pendingFiles);
                     mPendingFiles->put(pendingFiles+1);
+                    callParamCallbacks();
                     unlock();
 
                     mDownloadQueue.send(&curFile, sizeof(curFile));
@@ -1321,7 +1327,24 @@ void eigerDetector::saveTask (void)
             }
             total_written += written;
         }
-        close(fd);
+        if(close(fd) < 0)
+        {
+            ERR_ARGS("[file=%s] failed to close local file (%s)", file->name, fullFileName);
+            perror("close");
+            file->remove = false;
+            goto reap;
+        }
+
+        if(total_written == file->len)
+        {
+            int numFilesSaved;
+            lock();
+            mLastSavedFile->put(fullFileName);
+            mNumFilesSaved->get(numFilesSaved);
+            mNumFilesSaved->put(numFilesSaved+1);
+            callParamCallbacks();
+            unlock();
+        }
 
 reap:
         mReapQueue.send(&file, sizeof(file));
@@ -1357,6 +1380,7 @@ void eigerDetector::reapTask (void)
             lock();
             mPendingFiles->get(pendingFiles);
             mPendingFiles->put(pendingFiles-1);
+            callParamCallbacks();
             unlock();
         }
     }
@@ -1659,6 +1683,8 @@ asynStatus eigerDetector::initParams (void)
     mArmed->put(false);
     mSequenceId->put(0);
     mPendingFiles->put(0);
+    mLastSavedFile->put("");
+    mNumFilesSaved->put(0);
     mMonitorEnable->put(false);
     mMonitorTimeout->put(500);
     mFileOwner->put("");
