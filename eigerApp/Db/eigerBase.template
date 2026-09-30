@@ -658,7 +658,7 @@ record(waveform, "$(P)$(R)LastSavedFile_RBV") {
 record(longin, "$(P)$(R)NumFilesSaved_RBV") {
     field(DTYP, "asynInt32")
     field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))NUM_FILES_SAVED")
-    field(DESC, "Files saved in current sequence")
+    field(DESC, "Consecutive files saved in sequence")
     field(EGU,  "files")
     field(SCAN, "I/O Intr")
 }

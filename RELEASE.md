@@ -22,9 +22,11 @@ R3-6 (April XXX, 2026)
   - Added new FWHDF5Format record for the FileWriter interface to select the Legacy of v2024.2 format.
 * Added FileWriter progress and successful local-save readbacks.
   PendingFiles_RBV reports outstanding work; LastSavedFile_RBV and NumFilesSaved_RBV
-  report successful local saves. The Int32 count includes master and data files;
+  report successful local saves. The Int32 count advances in file order, starting
+  with the master, and cannot skip failed downloads or saves;
   the path and count reset after each successful arm. FullFileName_RBV keeps its
   pre-write behavior, and failed closes preserve the detector copy.
+* Fixed failed-download cleanup so pending work drains and the detector copy is retained.
 * Added support for reading multiple thresholds.
   This is only for Eiger2 and Pilatus4 detectors, not older Pilatus or Eiger models.
   - If DataSource=Stream with Stream2 or DataSource=FileWriter v2024.2 and if 

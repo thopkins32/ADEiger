@@ -91,6 +91,7 @@ typedef struct
     char name[MAX_BUF_SIZE];
     char *data;
     size_t len;
+    size_t index;
     bool save, parse, remove;
     size_t refCount;
     uid_t uid, gid;
@@ -1124,6 +1125,7 @@ void eigerDetector::pollTask (void)
         {
             bool isMaster = i == 0;
 
+            files[i].index    = i;
             files[i].save     = acquisition.saveFiles;
             files[i].parse    = isMaster ? false : acquisition.parseFiles;
             files[i].refCount = files[i].save + files[i].parse;
@@ -1215,6 +1217,8 @@ void eigerDetector::downloadTask (void)
         if(mApi.getFile(file->name, &file->data, &file->len))
         {
             ERR_ARGS("underlying getFile(%s) failed", file->name);
+            file->remove = false;
+            file->refCount = 1; // Neither save nor parse received the file.
             mReapQueue.send(&file, sizeof(file));
         }
         else
@@ -1341,7 +1345,9 @@ void eigerDetector::saveTask (void)
             lock();
             mLastSavedFile->put(fullFileName);
             mNumFilesSaved->get(numFilesSaved);
-            mNumFilesSaved->put(numFilesSaved+1);
+            // A skipped file must not certify later files.
+            if(file->index == (size_t)numFilesSaved)
+                mNumFilesSaved->put(numFilesSaved+1);
             callParamCallbacks();
             unlock();
         }

@@ -181,11 +181,13 @@ will remain on the detector disk unless FWAutoRemove is set to Yes.
 ``PendingFiles_RBV`` counts outstanding download/save/parse work. Zero does
 not prove save success or acquisition completion.
 
-``LastSavedFile_RBV`` and ``NumFilesSaved_RBV`` update after a successful
-local write and close, counting both master and data files. Each successful
-arm clears the saved path and resets the count, including re-arms in
-continuous mode. Failed arming or saving leaves the previous completion
-values unchanged.
+``LastSavedFile_RBV`` reports the last file successfully written and closed.
+``NumFilesSaved_RBV`` counts consecutive completed files: 1 certifies the
+master, 2 also certifies data file 1, and so on. A failed download or save
+prevents the count advancing past that file, even if later saves succeed.
+Each successful arm clears the saved path and resets the count, including
+re-arms in continuous mode. Failed arming leaves the previous values
+unchanged.
 
 Image counters and ``FullFileName_RBV`` are not save-completion signals:
 ``FullFileName_RBV`` still updates before writing. The new readbacks provide
@@ -724,8 +726,8 @@ FileWriter Interface
     - LastSavedFile_RBV
     - waveform
   * - N.A.
-    - Successful local saves in the current sequence, including master and
-      data files.
+    - Consecutive completed files: master first, then data files. Does not
+      advance past a failed download or save.
     - NumFilesSaved_RBV
     - longin
   * - N.A.
