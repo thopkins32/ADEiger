@@ -13,6 +13,7 @@
 #include <epicsThread.h>
 #include <epicsMessageQueue.h>
 #include <iocsh.h>
+#include <errno.h>
 #include <string.h>
 #include <math.h>
 #include <sys/fsuid.h>
@@ -1333,8 +1334,9 @@ void eigerDetector::saveTask (void)
         }
         if(close(fd) < 0)
         {
-            ERR_ARGS("[file=%s] failed to close local file (%s)", file->name, fullFileName);
-            perror("close");
+            const int savedErrno = errno;
+            ERR_ARGS("[file=%s] failed to close local file (%s): %s",
+                     file->name, fullFileName, strerror(savedErrno));
             file->remove = false;
             goto reap;
         }

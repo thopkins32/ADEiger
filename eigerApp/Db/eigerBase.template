@@ -639,7 +639,7 @@ record(bi,"$(P)$(R)SaveFiles_RBV") {
     field(SCAN, "I/O Intr")
 }
 
-record(longin, "$(P)$(R)PendingFiles_RBV") {
+record(longin, "$(P)$(R)NumFilesPending_RBV") {
     field(DTYP, "asynInt32")
     field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))PENDING_FILES")
     field(DESC, "Files pending download/save/parse")

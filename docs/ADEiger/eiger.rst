@@ -178,7 +178,7 @@ polls the detector at a nominal rate of 10Hz. While a file is being
 processed the next file available is downloaded in parallel. All files
 will remain on the detector disk unless FWAutoRemove is set to Yes.
 
-``PendingFiles_RBV`` counts outstanding download/save/parse work. Zero does
+``NumFilesPending_RBV`` counts outstanding download/save/parse work. Zero does
 not prove save success or acquisition completion.
 
 ``LastSavedFile_RBV`` reports the last file successfully written and closed.
@@ -718,7 +718,7 @@ FileWriter Interface
     - bo, bi
   * - N.A.
     - Outstanding download/save/parse work.
-    - PendingFiles_RBV
+    - NumFilesPending_RBV
     - longin
   * - N.A.
     - IOC-local path of the last successfully saved file in the current sequence.
