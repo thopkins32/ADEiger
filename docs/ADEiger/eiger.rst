@@ -178,6 +178,9 @@ polls the detector at a nominal rate of 10Hz. While a file is being
 processed the next file available is downloaded in parallel. All files
 will remain on the detector disk unless FWAutoRemove is set to Yes.
 
+``NumFilesPending_RBV`` counts outstanding download/save/parse work. Zero does
+not prove save success or acquisition completion.
+
 When saving files to disk (SaveFiles = Yes) it is possible to set the
 file's owner, its group and its access permissions with FileOwner,
 FileOwnerGrp and FilePerms PVs. To be able to set arbitrary owners the
@@ -701,6 +704,10 @@ FileWriter Interface
     - Controls whether acquired files should be saved locally to disk
     - SaveFiles, SaveFiles_RBV
     - bo, bi
+  * - N.A.
+    - Outstanding download/save/parse work.
+    - NumFilesPending_RBV
+    - longin
   * - N.A.
     - Controls the owner of the file saved to disk. Requires the IOC to have the CAP_SETUID
       capability.

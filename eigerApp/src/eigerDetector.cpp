@@ -1140,6 +1140,7 @@ void eigerDetector::pollTask (void)
         // While acquiring, wait and download every file on the list
         lock();
         mPendingFiles->put(0);
+        callParamCallbacks();
         unlock();
 
         i = 0;
@@ -1157,6 +1158,7 @@ void eigerDetector::pollTask (void)
                     lock();
                     mPendingFiles->get(pendingFiles);
                     mPendingFiles->put(pendingFiles+1);
+                    callParamCallbacks();
                     unlock();
 
                     mDownloadQueue.send(&curFile, sizeof(curFile));
@@ -1359,6 +1361,7 @@ void eigerDetector::reapTask (void)
             lock();
             mPendingFiles->get(pendingFiles);
             mPendingFiles->put(pendingFiles-1);
+            callParamCallbacks();
             unlock();
         }
     }

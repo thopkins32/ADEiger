@@ -20,6 +20,7 @@ R3-6 (April XXX, 2026)
      ImageJ NTNDArrayViewer plugin in ADViewers R1-8.
 * Added support for the v2024.2 format in the FileWriter interface, which also supports multiple thresholds.
   - Added new FWHDF5Format record for the FileWriter interface to select the Legacy of v2024.2 format.
+* Added NumFilesPending_RBV, which reports outstanding download/save/parse work.
 * Fixed failed-download cleanup so pending work drains and the detector copy is retained.
 * Added support for reading multiple thresholds.
   This is only for Eiger2 and Pilatus4 detectors, not older Pilatus or Eiger models.
