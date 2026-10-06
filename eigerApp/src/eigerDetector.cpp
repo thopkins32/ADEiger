@@ -1209,6 +1209,8 @@ void eigerDetector::downloadTask (void)
         if(mApi.getFile(file->name, &file->data, &file->len))
         {
             ERR_ARGS("underlying getFile(%s) failed", file->name);
+            file->remove = false;
+            file->refCount = 1; // Neither save nor parse received the file.
             mReapQueue.send(&file, sizeof(file));
         }
         else
